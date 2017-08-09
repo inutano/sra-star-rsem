@@ -63,11 +63,14 @@ date_cmd() {
 logging() {
   local m="${1}"
   local date_option="${2}"
+
   if [[ ${date_option} == 'date_on' ]]; then
     local m="${m} ($(date_cmd --rfc-2822))"
   fi
+
   if [[ -z "${QUIET_OPTION}" ]]; then
-    echo "${m}" >&2 | tee -a "${LOGFILE}"
+    echo "${m}" >&2
+    echo "${m}" >> ${LOGFILE}
   else
     echo "${m}" >> "${LOGFILE}"
   fi
