@@ -2,13 +2,13 @@
 #
 #  rnaseq_readcount.sh
 #    usage:
-#      ./rnaseq_readcount.sh [-j|--job-conf] <job configuration file> [-f|--sra-file] <input sra file>[,<input sra file>,..] [-exp|--experiment-id] <Experiment ID>
+#      ./rnaseq_readcount.sh [-j|--job-conf] <job configuration file> [-f|--sra-file] <input sra file>[,<input sra file>,..] [-x|--experiment-id] <Experiment ID>
 #
 #    example:
-#      ./rnaseq_readcount.sh -j job_conf.sh -f SRR1274307.sra,SRR1274306.sra -exp SRX534534
+#      ./rnaseq_readcount.sh -j job_conf.sh -f SRR1274307.sra,SRR1274306.sra -x SRX534534
 #
 set -e
-VERSION="201708081200"
+VERSION="201708092200"
 
 #
 # argparse
@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
       INPUT_FILES="${2}"
       shift
       ;;
-    -exp|--experiment-id)
+    -x|--experiment-id)
       EXPERIMENT_ID="${2}"
       shift
       ;;
@@ -69,11 +69,14 @@ date_cmd() {
 logging() {
   local m="${1}"
   local date_option="${2}"
+
   if [[ ${date_option} == 'date_on' ]]; then
     local m="${m} ($(date_cmd --rfc-2822))"
   fi
+
   if [[ -z "${QUIET_OPTION}" ]]; then
-    echo "${m}" >&2 | tee -a "${LOGFILE}"
+    echo "${m}" >&2
+    echo "${m}" >> ${LOGFILE}
   else
     echo "${m}" >> "${LOGFILE}"
   fi
@@ -88,35 +91,12 @@ resolve_path(){
   done
 }
 
-# Check if directory is existing, then create if 'create' flag is used
-confirm_dir() {
-  local target="${1}"
-  local force_create="${2}"
-
-  if [[ -f "${target}" ]]; then
-    local dir=$(dirname "${target}")
-  else
-    local dir="${target}"
-  fi
-
-  if [[ "${force_create}" == 'create' ]]; then
-    mkdir -p "${target}" && logging "Directory created: ${target}"
-  else
-    if [[ -e "${target}" ]]; then
-      logging "Set directory: ${target}"
-    else
-      logging "!!! ERROR: directory not found at ${target}"
-      exit 1
-    fi
-  fi
-}
-
 #
 # Functions
 #
 
 load_args() {
-  echo "Initializing workflow.." >&2
+  echo "Loading configuration file.." >&2
 
   # Load job configuration
   if [[ "${JOB_CONF}" ]]; then
@@ -125,7 +105,9 @@ load_args() {
     echo "ERROR: Job configuration file not found." >&2
     exit 1
   fi
+}
 
+validate_arguments() {
   # Check required arguments
   if [[ ! "${INPUT_FILES}" ]]; then
     echo "ERROR: No input files found." >&2
@@ -137,78 +119,68 @@ load_args() {
     exit 1
   fi
 
-  # Overwrite arguments
-  if [[ ! -z "${TMPDIR_ARG}" ]]; then
-    TMPDIR="${TMPDIR_ARG}"
-  fi
-
-  if [[ ! -z "${OUTDIR_ARG}" ]]; then
-    OUTDIR="${OUTDIR_ARG}"
-  fi
-
-  TMPDIR="$(resolve_path "${TMPDIR}")/${EXPERIMENT_ID:0:6}/${EXPERIMENT_ID}/$(date_cmd +%Y%m%d-%H%M)/tmp"
-  OUTDIR="$(resolve_path "${OUTDIR}")/${EXPERIMENT_ID:0:6}/${EXPERIMENT_ID}/$(date_cmd +%Y%m%d-%H%M)"
+  # Resolve absolute path to input files
   FILES="$(resolve_path "$(echo ${INPUT_FILES} | sed -e 's:,: :g')")"
 }
 
-create_logfile() {
-  LOGFILE="${OUTDIR}/${EXPERIMENT_ID}.log"
+validate_dirs() {
+  # Overwrite arguments
+  [[ "${TMPDIR_ARG}" ]] && TMPDIR="${TMPDIR_ARG}"
+  [[ "${OUTDIR_ARG}" ]] && OUTDIR="${OUTDIR_ARG}"
 
-  mkdir -p $(dirname "${LOGFILE}") && touch "${LOGFILE}" \
+  # Default tmp/outdir
+  [[ "${TMPDIR}" ]] || TMPDIR="${HOME}/data/readcount"
+  [[ "${OUTDIR}" ]] || OUTDIR="${HOME}/data/readcount"
+
+  # Create tmp/output directory if not exist
+  [[ -e "${OUTDIR}" ]] || mkdir -p "${OUTDIR}"
+  [[ -e "${TMPDIR}" ]] || mkdir -p "${TMPDIR}"
+
+  # Resolve absolute path to tmp/outdir and create them
+  TMPDIR="$(resolve_path "${TMPDIR}")/${EXPERIMENT_ID:0:6}/${EXPERIMENT_ID}/$(date_cmd +%Y%m%d-%H%M)/tmp"
+  OUTDIR="$(resolve_path "${OUTDIR}")/${EXPERIMENT_ID:0:6}/${EXPERIMENT_ID}/$(date_cmd +%Y%m%d-%H%M)"
+
+  # Create outdir first to start logging
+  mkdir -p "${OUTDIR}"
+
+  # Create log file in the output directory
+  LOGFILE="${OUTDIR}/${EXPERIMENT_ID}.wf_readcount.log"
+  touch "${LOGFILE}" \
     && logging "Created log file at ${LOGFILE}" \
     || (echo "ERROR: failed to create log file at ${LOGFILE}" && exit 1)
+
+  # Set tmp/outdir
+  logging "Set output directory ${OUTDIR}"
+  mkdir -p "${TMPDIR}" && logging "Set temporary directory ${TMPDIR}"
 }
 
-validate() {
-  logging ""
-  logging "Validating.."
-
-  [[ "${RSEM_INDEX_DIR}" ]] \
+validate_inputs() {
+  [[ -e "${RSEM_INDEX_DIR}" ]] \
     && logging "Set RSEM index directory: ${RSEM_INDEX_DIR}" \
-    || (logging "ERROR: RSEM_INDEX_DIR not defined." && exit 1)
+    || (logging "ERROR: RSEM_INDEX_DIR not found." && exit 1)
 
   [[ "${RSEM_INDEX_PREFIX}" ]] \
     && logging "Set RSEM index prefix: ${RSEM_INDEX_PREFIX}" \
     || (logging "ERROR: RSEM_INDEX_PREFIX not defined." && exit 1)
 
-  [[ "${NUMBER_OF_THREADS}" ]] \
-    && logging "Set number of threads: ${NUMBER_OF_THREADS}" \
-    || (logging "ERROR: NUMBER_OF_THREADS not defined." && exit 1)
-
-  [[ -e "${TMPDIR}" ]] \
-    && logging "Set temporary directory ${TMPDIR}" \
-    || (mkdir -p "${TMPDIR}" && logging "Create temporary directory ${TMPDIR}")
-
-  [[ -e "${OUTDIR}" ]] \
-    && logging "Set output directory ${OUTDIR}" \
-    || (mkdir -p "${OUTDIR}" && logging "Create output directory ${OUTDIR}")
+  [[ "${NUMBER_OF_THREADS}" ]] || NUMBER_OF_THREADS=2
+  logging "Set number of threads: ${NUMBER_OF_THREADS}"
 }
 
-vld() {
-  local role=${1}
-  local env_v=${2}
-  if [[ -z ${env_v} ]]; then
-    logging "ERROR: Setting variable for ${role} failed."
-    exit 1
-  else
-    logging "Set ${role}: ${env_v}"
-  fi
-}
-
-check_configuration(){
-  logging "$(cat "${JOB_CONF}" | awk '$1 !~ /^#/ && NF')"
+validate_setting() {
+  validate_arguments
+  validate_dirs
+  validate_inputs
 }
 
 check_binary(){
-  local stepname=${2}
   logging ""
-  logging "[step ${stepname}] checking executable."
-
   local cmd=${1}
+  local stepname=${2}
   local cmd_path=$(which ${cmd} 2>/dev/null)
 
   if [[ -e "${cmd_path}" ]]; then
-    logging "Executable ${cmd} found at ${cmd_path}, version: $(${cmd} --version 2>&1 | head -1)"
+    logging "[step ${stepname}] Executable ${cmd} found at ${cmd_path}, version: $(${cmd} --version 2>&1 | head -1)"
   else
     logging "ERROR: command not found: ${cmd}"
     exit 1
@@ -290,11 +262,16 @@ clean_directories() {
   logging "$(ls -l ${OUTDIR})"
 }
 
-wf_rnaseq_recount() {
+wf_rnaseq_readcount() {
   logging "Starting workflow for ${EXPERIMENT_ID}.." 'date_on'
 
+  # Run pfastq-dump and get a path to fastq file
   step1_out=`run_pfastq_dump "$(echo "${FILES}" | tr '\n' ' ')"`
+
+  # Run RSEM
   run_rsem "${step1_out}"
+
+  # Remove tmpdir
   clean_directories
 
   logging "Finished workflow for ${EXPERIMENT_ID}." 'date_on'
@@ -304,14 +281,11 @@ main() {
   # Load configuration file
   load_args
 
-  # Create log file
-  create_logfile
-
   # Validate settings
-  validate
+  validate_setting
 
   # Run workflow
-  wf_rnaseq_recount
+  wf_rnaseq_readcount
 }
 
 #
