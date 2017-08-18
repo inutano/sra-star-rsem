@@ -274,8 +274,8 @@ main() {
   # Validate settings
   validate_settings
 
-  # Init download process
-  init_download
+  # Init download process and detach
+  init_download &
   sleep 3
 
   # Init calculation process
