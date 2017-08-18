@@ -147,6 +147,11 @@ validate_inputs() {
   [[ "${NUMBER_OF_THREADS}" ]] || NUMBER_OF_THREADS=2
   logging "Set number of threads: ${NUMBER_OF_THREADS}"
 
+  [[ -e "${EXPERIMENT_ID_LIST}" ]] \
+    && EXPS="$(cat ${EXPERIMENT_ID_LIST})" \
+    || EXPS="$(echo ${EXPERIMENT_ID_LIST} | tr ',' '\n')"
+  logging "Number of experiments to process: $(echo "${EXPS}" | wc -l | tr -d ' ')"
+
   [[ -e "${RSEM_INDEX_DIR}" ]] \
     && logging "Set RSEM index directory: ${RSEM_INDEX_DIR}" \
     || (logging "ERROR: RSEM_INDEX_DIR not found." && exit 1)
@@ -164,8 +169,20 @@ validate_settings() {
 
 ## Download data from SRA
 
-init_download(){
-  echo ""
+download_data() {
+  local id="${1}"
+  sleep 1
+  echo "${id} downloaded."
+}
+
+init_download() {
+  logging "Start downloading data.." 'date_on'
+
+  echo "${EXPS}" | while read exp_id; do
+    download_data "${exp_id}"
+  done
+
+  logging "Download finished." 'date_on'
 }
 
 ## Calculate downloaded data
@@ -191,6 +208,7 @@ main() {
 
   # Init download process
   init_download
+  sleep 3
 
   # Init calculation process
   init_calculation
