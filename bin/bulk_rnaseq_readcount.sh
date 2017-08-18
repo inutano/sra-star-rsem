@@ -126,6 +126,7 @@ validate_dirs() {
   # Create log file in the output directory
   LOGFILE="${OUTDIR}/bulk_wf_readcount.log"
   touch "${LOGFILE}" \
+    && logging "Bulk RNA-seq readcount workflow: version ${VERSION}" \
     && logging "Created log file at ${LOGFILE}" \
     || (echo "ERROR: failed to create log file at ${LOGFILE}" && exit 1)
 
