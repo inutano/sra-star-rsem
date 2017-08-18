@@ -142,6 +142,13 @@ validate_dirs() {
 }
 
 validate_inputs() {
+  # Data source
+  [[ "${DATABASE}" ]] || DATABASE="ddbj"
+  logging "Set data download source: ${DATABASE}"
+
+  [[ "${DL_METHOD}" ]] || DL_METHOD="lftp"
+  logging "Set download method: ${DL_METHOD}"
+
   [[ "${NUMBER_OF_PARALLEL_FTP}" ]] || NUMBER_OF_PARALLEL_FTP=8
   logging "Set number of ftp connections: ${NUMBER_OF_PARALLEL_FTP}"
 
@@ -170,17 +177,77 @@ validate_settings() {
 
 ## Download data from SRA
 
-download_data() {
-  local id="${1}"
-  sleep 1
-  echo "${id} downloaded."
+ddbj_url() {
+  local target_dir_path="${1}"
+  local path="ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/sralite/ByExp/litesra/${target_dir_path}"
+  echo "${path}"
+}
+
+ncbi_url() {
+  local target_dir_path="${1}"
+  local path="ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/${target_dir_path}"
+  echo "${path}"
+}
+
+generate_ftp_url() {
+  local exp_id=${1}
+  local target_dir_path="${exp_id:0:3}/${exp_id:0:6}/${exp_id}"
+  case ${DATABASE} in
+    ddbj)
+      echo $(ddbj_url "${target_dir_path}")
+      ;;
+    ncbi)
+      echo $(ncbi_url "${target_dir_path}")
+      ;;
+  esac
+}
+
+fetch_data_lftp() {
+  local exp_id=${1}
+
+  # Set download cache directory for this experiment
+  local cache_dir="${FTP_CACHE_DIR}/${exp_id:0:6}/${exp_id}"
+  mkdir -p "${cache_dir}"
+
+  # Set download dest directory for this experiment
+  local target_dir="${FTP_DL_DIR}/${exp_id:0:6}/${exp_id}"
+  mkdir -p "${target_dir}"
+
+  # Set download log file in cache directory
+  local download_log="${target_dir}/${exp_id}.log"
+
+  # Generate ftp download url from experiment id
+  local url="$(generate_ftp_url ${exp_id})"
+  echo "Downloading data from ${url} ($(date_cmd --rfc-2822))" > "${download_log}"
+
+  {
+    time (
+      lftp -c "set net:max-retries 3; set net:timeout 5; mirror --parallel=${NUMBER_OF_PARALLEL_FTP} ${url} ${cache_dir}"
+    );
+  } 1>&2 2>> "${download_log}"
+
+  # Collect downloaded data to outdir
+  chmod -R u+w "${cache_dir}"
+  find "${cache_dir}" -name '*sra' | xargs -I{} mv {} "${target_dir}"
+
+  ls -lR "${target_dir}" >> "${download_log}"
+  echo "Donwload successfully finished. ($(date_cmd --rfc-2822))" >> "${download_log}"
+}
+
+fetch_data() {
+  local exp_id=${1}
+  case ${DL_METHOD} in
+    lftp)
+      fetch_data_lftp "${exp_id}"
+      ;;
+  esac
 }
 
 init_download() {
   logging "Start downloading data.." 'date_on'
 
   echo "${EXPS}" | while read exp_id; do
-    download_data "${exp_id}"
+    fetch_data "${exp_id}"
   done
 
   logging "Download finished." 'date_on'
