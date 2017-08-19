@@ -301,7 +301,7 @@ init_calculation(){
         # Run calculation workflow
         cmd="${WF_SCRIPT} -j ${JOB_CONF} -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR}"
         logging "${cmd}" 'date_on'
-        `${cmd}`
+        sh ${cmd}
 
         # Remove tmpd
         rm -fr "${tmpd}"
