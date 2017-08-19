@@ -139,6 +139,10 @@ validate_dirs() {
   FTP_DL_DIR="${TMPDIR}/ftp/download"
   mkdir -p "${FTP_CACHE_DIR}" && logging "Set FTP cache directory ${FTP_CACHE_DIR}"
   mkdir -p "${FTP_DL_DIR}" && logging "Set FTP download directory ${FTP_DL_DIR}"
+
+  # Set tmpdir for calculation
+  CALC_TMPDIR="${TMPDIR}/calc"
+  mkdir -p "${CALC_TMPDIR}" && logging "Set tmpdir for calculation ${CALC_TMPDIR}"
 }
 
 validate_inputs() {
@@ -250,22 +254,64 @@ init_download() {
     fetch_data "${exp_id}"
   done
 
+  # Create token and cleaning tmpdir
+  touch "${TMPDIR}/ftp/download_finished"
   logging "Download finished." 'date_on'
 }
 
 ## Calculate downloaded data
 
 init_calculation(){
-  echo ""
+  logging "Start calculation.." 'date_on'
+
+  while :
+  do
+    # Find downloaded data, then collect paths to experiment directories
+    exp_dirs=$(find "${FTP_DL_DIR}" -name '*sra' | xargs -I{} dirname {} | sort -u)
+
+    # if no data found
+    if [[ ! "${exp_dirs}" ]]; then
+
+      # And download_finished token found, break the loop and exit
+      if [[ -e "${TMPDIR}/ftp/download_finished" ]]; then
+        break
+      fi
+
+    # if any downloaded sra file found
+    else
+
+      echo "${exp_dirs}" | while read expdir; do
+        expid=$(basename "${expdir}")
+
+        # Move downloaded data to tmpdir for calculation
+        mv "${expdir}" "${CALC_TMPDIR}"
+        tmpd="${CALC_TMPDIR}/${expid}"
+
+        # List items to be processed
+        items=$(find "${tmpd}" -name '*sra' | tr '\n' ',' | sed -e 's:,$::')
+
+        # Run calculation workflow
+        echo "workflow.sh -j conf.sh -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR}"
+
+        # Remove tmpd
+        rm -fr "${tmpd}"
+      done
+    fi
+
+    # Sleep to wait for next items to be downloaded
+    sleep 5
+  done
 }
 
-## Watch download and calculate processes
+## Cleaning
 
-init_watch(){
-  echo ""
+clean_dirs() {
+  rm -fr "${FTP_CACHE_DIR}"
+  rm -fr "${FTP_DL_DIR}"
+  rm -fr "${CALC_TMPDIR}"
 }
 
-## main
+## Main
 
 main() {
   # Load configuration file
@@ -281,8 +327,8 @@ main() {
   # Init calculation process
   init_calculation
 
-  # Init watch process
-  init_watch
+  # Cleaning
+  clean_dirs
 }
 
 #
