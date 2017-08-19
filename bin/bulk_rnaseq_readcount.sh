@@ -135,8 +135,9 @@ validate_dirs() {
   mkdir -p "${TMPDIR}" && logging "Set temporary directory ${TMPDIR}"
 
   # Set FTP download dirs
-  FTP_CACHE_DIR="${TMPDIR}/ftp/cache"
-  FTP_DL_DIR="${TMPDIR}/ftp/download"
+  FTP_TMPDIR="${TMPDIR}/ftp"
+  FTP_CACHE_DIR="${FTP_TMPDIR}/cache"
+  FTP_DL_DIR="${FTP_TMPDIR}/download"
   mkdir -p "${FTP_CACHE_DIR}" && logging "Set FTP cache directory ${FTP_CACHE_DIR}"
   mkdir -p "${FTP_DL_DIR}" && logging "Set FTP download directory ${FTP_DL_DIR}"
 
@@ -255,7 +256,7 @@ init_download() {
   done
 
   # Create token and cleaning tmpdir
-  touch "${TMPDIR}/ftp/download_finished"
+  touch "${FTP_TMPDIR}/download_finished"
   logging "Download finished." 'date_on'
 }
 
@@ -273,7 +274,7 @@ init_calculation(){
     if [[ ! "${exp_dirs}" ]]; then
 
       # And download_finished token found, break the loop and exit
-      if [[ -e "${TMPDIR}/ftp/download_finished" ]]; then
+      if [[ -e "${FTP_TMPDIR}/download_finished" ]]; then
         break
       fi
 
