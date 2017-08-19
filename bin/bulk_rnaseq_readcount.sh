@@ -94,6 +94,7 @@ load_config() {
 
   # Load job configuration
   if [[ -e "${JOB_CONF}" ]]; then
+    JOB_CONF=$(resolve_path "${JOB_CONF}")
     source "${JOB_CONF}"
   else
     echo "ERROR: Job configuration file ${JOB_CONF} not found." >&2
@@ -160,14 +161,20 @@ validate_inputs() {
   [[ "${NUMBER_OF_THREADS}" ]] || NUMBER_OF_THREADS=2
   logging "Set number of threads: ${NUMBER_OF_THREADS}"
 
+  WF_SCRIPT="$(resolve_path "${WF_SCRIPT}")"
+  [[ -e "${WF_SCRIPT}" ]] \
+    && logging "Set calculation workflow script path: ${WF_SCRIPT}" \
+    || (logging "ERROR: calculation workflow script not found." && exit 1)
+
   [[ -e "${EXPERIMENT_ID_LIST}" ]] \
     && EXPS="$(cat ${EXPERIMENT_ID_LIST})" \
     || EXPS="$(echo ${EXPERIMENT_ID_LIST} | tr ',' '\n')"
   logging "Number of experiments to process: $(echo "${EXPS}" | wc -l | tr -d ' ')"
 
+
   [[ -e "${RSEM_INDEX_DIR}" ]] \
-    && logging "Set RSEM index directory: ${RSEM_INDEX_DIR}" \
-    || (logging "ERROR: RSEM_INDEX_DIR not found." && exit 1)
+    && (RSEM_INDEX_DIR="$(resolve_path "${RSEM_INDEX_DIR}")" && logging "Set RSEM index directory: ${RSEM_INDEX_DIR}") \
+    || (logging "ERROR: RSEM_INDEX_DIR ${RSEM_INDEX_DIR} not found." && exit 1)
 
   [[ "${RSEM_INDEX_PREFIX}" ]] \
     && logging "Set RSEM index prefix: ${RSEM_INDEX_PREFIX}" \
@@ -292,7 +299,9 @@ init_calculation(){
         items=$(find "${tmpd}" -name '*sra' | tr '\n' ',' | sed -e 's:,$::')
 
         # Run calculation workflow
-        echo "workflow.sh -j conf.sh -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR}"
+        cmd="${WF_SCRIPT} -j ${JOB_CONF} -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR}"
+        logging "${cmd}" 'date_on'
+        `${cmd}`
 
         # Remove tmpd
         rm -fr "${tmpd}"
@@ -307,9 +316,7 @@ init_calculation(){
 ## Cleaning
 
 clean_dirs() {
-  rm -fr "${FTP_CACHE_DIR}"
-  rm -fr "${FTP_DL_DIR}"
-  rm -fr "${CALC_TMPDIR}"
+  rm -fr "${TMPDIR}"
 }
 
 ## Main
@@ -319,7 +326,7 @@ main() {
   load_config
 
   # Validate settings
-  validate_settings
+  set -e; validate_settings; set +e
 
   # Init download process and detach
   init_download &
