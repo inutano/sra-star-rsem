@@ -214,6 +214,15 @@ generate_ftp_url() {
   esac
 }
 
+get_filesize() {
+  local url="${1}"
+  lftp -c "open ${url} && ls -R" | awk '$0 ~ /sra$/ { sum+=$5 }END{ print sum }'
+}
+
+disk_availability() {
+  df -P "${TMPDIR}" | awk 'NR == 2 { print $4 }'
+}
+
 fetch_data_lftp() {
   local exp_id=${1}
 
@@ -231,6 +240,18 @@ fetch_data_lftp() {
   # Generate ftp download url from experiment id
   local url="$(generate_ftp_url ${exp_id})"
   echo "Downloading data from ${url} ($(date_cmd --rfc-2822))" > "${download_log}"
+
+  # Get file size
+  filesize=$(get_filesize "${url}")
+  echo "Total file size: ${filesize}" >> "${download_log}"
+
+  # Wait until disk is free (at least free space of double file size is required)
+  volume=$(disk_availability)
+  while [[ ${filesize}*2 -gt ${volume} ]]; do
+    sleep 60
+    volume=$(disk_availability)
+    echo "Disk full! file size: ${filesize}, disk space: ${volume} ($(date_cmd --rfc-2822))" >> "${download_log}"
+  done
 
   {
     time (
