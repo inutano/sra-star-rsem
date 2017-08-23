@@ -13,3 +13,9 @@ $ ./bin/download_sra.sh --database ncbi --experiment SRX534534 --outdir $(pwd)
 $ ./bin/rnaseq_readcount.sh -j ./conf/conf_example.sh -f SRX534/SRX534534/<date of download>/SRR1274306.sra,SRX534/SRX534534/<date of download>/SRR1274307.sra -x SRX534534
 ```
 
+# Bulk execution
+
+```
+$ cd rnaseq-readcount-workflow
+$ ./bin/bulk_rnaseq_readcount.sh -j ./conf/bulk_conf_example.sh
+```
