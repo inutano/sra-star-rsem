@@ -161,6 +161,8 @@ validate_inputs() {
   [[ "${NUMBER_OF_THREADS}" ]] || NUMBER_OF_THREADS=2
   logging "Set number of threads: ${NUMBER_OF_THREADS}"
 
+  [[ "${USE_UGE}" ]] && QUEUE_ENV="qsub" && logging "Use UGE environment."
+
   WF_SCRIPT="$(resolve_path "${WF_SCRIPT}")"
   [[ -e "${WF_SCRIPT}" ]] \
     && logging "Set calculation workflow script path: ${WF_SCRIPT}" \
@@ -320,12 +322,23 @@ init_calculation(){
         items=$(find "${tmpd}" -name '*sra' | tr '\n' ',' | sed -e 's:,$::')
 
         # Run calculation workflow
-        cmd="${WF_SCRIPT} -j ${JOB_CONF} -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR}"
-        logging "${cmd}" 'date_on'
-        sh ${cmd}
+        cmd="${WF_SCRIPT} -j ${JOB_CONF} -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR} --delete-input"
 
-        # Remove tmpd
-        rm -fr "${tmpd}"
+        # Select entrypoint
+        case ${QUEUE_ENV} in
+          qsub)
+            exec_cmd="qsub -j y -o ${tmpd}/${expid}.uge.log -N ${expid} -l mem_req=4G,s_vmem=4G -pe def_slot ${NUMBER_OF_THREADS}"
+            ;;
+          *)
+            exec_cmd="sh"
+            ;;
+        esac
+
+        # Record command
+        logging "${exec_cmd} ${cmd}" 'date_on'
+
+        # Run
+        ${exec_cmd} ${cmd}
       done
     fi
 
@@ -337,7 +350,7 @@ init_calculation(){
 ## Cleaning
 
 clean_dirs() {
-  rm -fr "${TMPDIR}"
+  [[ "${LEAVE_TMPDIR}" ]] || rm -fr "${TMPDIR}"
 }
 
 ## Main

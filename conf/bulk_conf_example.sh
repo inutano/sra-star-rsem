@@ -21,6 +21,10 @@ NUMBER_OF_PARALLEL_FTP=8
 # Set number of threads to be used by calculation
 NUMBER_OF_THREADS=2
 
+# Uncomment lines below to enable UGE execution
+#USE_UGE="true"
+#LEAVE_TMPDIR="true"
+
 # Set path to the calculation workflow script, should be absolute path
 WF_SCRIPT="${HOME}/repos/rnaseq-readcount-workflow/bin/rnaseq_readcount.sh"
 
