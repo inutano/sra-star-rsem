@@ -241,7 +241,7 @@ run_rsem_index() {
 run_rsem() {
   local input_fastq="${1}"
   local stepname="rsem-calculate"
-  local base_command="RSEM-Load"
+  local base_command="rsem-calculate-expression"
   local args="--star --keep-intermediate-files --no-bam-output -p ${NUMBER_OF_THREADS} ${input_fastq} ${RSEM_INDEX_DIR}/${RSEM_INDEX_PREFIX} ${EXPERIMENT_ID}"
 
   # Run rsem-calculate-expression

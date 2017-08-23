@@ -2,6 +2,12 @@
 
 get data from SRA, pfastq-dump/STAR/RSEM
 
+# Prerequisites
+
+- [lftp](https://lftp.yar.ru) and fast internet connection
+- [pfastq-dump](https://github.com/inutano/pfastq-dump)
+- [inutano/RSEM (build from inutano branch)](https://github.com/inutano/RSEM/tree/inutano)
+
 # Quick start
 
 Fetch data from NCBI and run workflow
