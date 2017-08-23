@@ -37,6 +37,9 @@ while [[ $# -gt 0 ]]; do
       OUTDIR_ARG="${2}"
       shift
       ;;
+    --delete-input)
+      DELETE_INPUT="true"
+      ;;
     -v|--version)
       echo "rnaseq_readcount version: ${VERSION}" >&2
       exit 0
@@ -260,6 +263,10 @@ clean_directories() {
   rm -fr "${TMPDIR}"
   logging "Result files are stored in ${OUTDIR}"
   logging "$(ls -l ${OUTDIR})"
+
+  if [[ "${DELETE_INPUT}" == 'true' ]]; then
+    rm -fr ${FILES}
+  fi
 }
 
 wf_rnaseq_readcount() {
