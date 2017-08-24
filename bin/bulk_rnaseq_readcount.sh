@@ -218,7 +218,15 @@ generate_ftp_url() {
 
 get_filesize() {
   local url="${1}"
-  lftp -c "open ${url} && ls -R" | awk '$0 ~ /sra$/ { sum+=$5 }END{ print sum }'
+  case ${DATABASE} in
+    ddbj)
+      list_cmd="ls -R"
+      ;;
+    ncbi)
+      list_cmd="ls */*sra"
+      ;;
+  esac
+  lftp -c "open ${url} && ${list_cmd}" | awk '$0 ~ /sra$/ { sum+=$5 }END{ print sum }'
 }
 
 disk_availability() {
