@@ -222,7 +222,8 @@ get_filesize() {
 }
 
 disk_availability() {
-  df -P "${TMPDIR}" | awk 'NR == 2 { print $4 }'
+  # output available volume size in bytes
+  echo $(( $(df -Pk "${TMPDIR}" | awk 'NR == 2 { print $4 }') * 1024 ))
 }
 
 fetch_data_lftp() {
@@ -246,13 +247,14 @@ fetch_data_lftp() {
   # Get file size
   filesize=$(get_filesize "${url}")
   echo "Total file size: ${filesize}" >> "${download_log}"
+  fsize_double=$(( ${filesize} * 2 ))
 
   # Wait until disk is free (at least free space of double file size is required)
   volume=$(disk_availability)
-  while [[ ${filesize}*2 -gt ${volume} ]]; do
+  while [[ ${fsize_double} -gt ${volume} ]]; do
     sleep 60
     volume=$(disk_availability)
-    echo "Disk full! file size: ${filesize}, disk space: ${volume} ($(date_cmd --rfc-2822))" >> "${download_log}"
+    echo "No enough disk space! require double file size (${fsize_double} bytes), only ${volume} bytes available ($(date_cmd --rfc-2822))" >> "${download_log}"
   done
 
   {
