@@ -257,6 +257,9 @@ fetch_data_lftp() {
     echo "No enough disk space! require double file size (${fsize_double} bytes), only ${volume} bytes available ($(date_cmd --rfc-2822))" >> "${download_log}"
   done
 
+  # Wait a moment before connect
+  sleep 1
+
   {
     time (
       lftp -c "set net:max-retries 3; set net:timeout 5; mirror --parallel=${NUMBER_OF_PARALLEL_FTP} ${url} ${cache_dir}"
