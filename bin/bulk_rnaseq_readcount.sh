@@ -8,7 +8,7 @@
 #    example:
 #      ./bulk_rnaseq_readcount.sh -j ./bulk_job_conf.sh
 #
-VERSION="201708231620"
+VERSION="201708241450"
 
 #
 # argparse
