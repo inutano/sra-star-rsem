@@ -270,7 +270,7 @@ clean_directories() {
 }
 
 wf_rnaseq_readcount() {
-  logging "Starting workflow for ${EXPERIMENT_ID}.." 'date_on'
+  logging "Starting workflow for ${EXPERIMENT_ID} at $(hostname).." 'date_on'
 
   # Run pfastq-dump and get a path to fastq file
   step1_out=`run_pfastq_dump "$(echo "${FILES}" | tr '\n' ' ')"`
