@@ -8,7 +8,7 @@
 #    example:
 #      ./bulk_rnaseq_readcount.sh -j ./bulk_job_conf.sh
 #
-VERSION="201708261210"
+VERSION="201708261740"
 
 #
 # argparse
@@ -348,6 +348,14 @@ init_calculation(){
         case ${QUEUE_ENV} in
           qsub)
             exec_cmd="qsub -j y -o ${job_logfile} -N ${expid} -l mem_req=4G,s_vmem=4G -pe def_slot ${NUMBER_OF_THREADS}"
+
+            # wait if too many jobs are in the queue
+            job_in_queue=$(qstat | grep $(whoami) | wc -l)
+            while [[ ${job_in_queue} -gt 200 ]]; do
+              sleep 60
+              job_in_queue=$(qstat | grep $(whoami) | wc -l)
+            done
+
             ;;
           slurm)
             exec_cmd="sbatch -n ${NUMBER_OF_THREADS} -o ${job_logfile} -J ${expid}"
