@@ -259,12 +259,13 @@ run_rsem() {
 }
 
 clean_directories() {
-  chmod -R u+w "${TMPDIR}"
+  chmod -R a+w "${TMPDIR}"
   rm -fr "${TMPDIR}"
   logging "Result files are stored in ${OUTDIR}"
   logging "$(ls -l ${OUTDIR})"
 
   if [[ "${DELETE_INPUT}" == 'true' ]]; then
+    chmod -R a+w ${FILES}
     rm -fr ${FILES}
   fi
 }
