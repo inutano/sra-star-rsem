@@ -8,7 +8,7 @@
 #    example:
 #      ./bulk_rnaseq_readcount.sh -j ./bulk_job_conf.sh
 #
-VERSION="201708241450"
+VERSION="201708261155"
 
 #
 # argparse
@@ -265,7 +265,7 @@ fetch_data_lftp() {
     echo "No enough disk space! require double file size (${fsize_double} bytes), only ${volume} bytes available ($(date_cmd --rfc-2822))" >> "${download_log}"
   done
 
-  # Wait a moment before connect
+  # Wait a moment before connecting
   sleep 1
 
   {
@@ -280,6 +280,9 @@ fetch_data_lftp() {
 
   ls -lR "${target_dir}" >> "${download_log}"
   echo "Donwload successfully finished. ($(date_cmd --rfc-2822))" >> "${download_log}"
+
+  # Wait a moment before connecting
+  sleep 1
 }
 
 fetch_data() {
