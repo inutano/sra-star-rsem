@@ -8,7 +8,7 @@
 #    example:
 #      ./bulk_rnaseq_readcount.sh -j ./bulk_job_conf.sh
 #
-VERSION="201708261155"
+VERSION="201708261210"
 
 #
 # argparse
@@ -161,7 +161,8 @@ validate_inputs() {
   [[ "${NUMBER_OF_THREADS}" ]] || NUMBER_OF_THREADS=2
   logging "Set number of threads: ${NUMBER_OF_THREADS}"
 
-  [[ "${USE_UGE}" ]] && QUEUE_ENV="qsub" && logging "Use UGE environment."
+  [[ "${USE_UGE}" ]] && QUEUE_ENV="qsub" && logging "Use UGE for job scheduling."
+  [[ "${USE_SLURM}" ]] && QUEUE_ENV="slurm" && logging "Use slurm for job scheduling."
 
   WF_SCRIPT="$(resolve_path "${WF_SCRIPT}")"
   [[ -e "${WF_SCRIPT}" ]] \
@@ -340,10 +341,16 @@ init_calculation(){
         # Run calculation workflow
         cmd="${WF_SCRIPT} -j ${JOB_CONF} -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR} --delete-input"
 
+        # log file for job scheduling system
+        job_logfile="${tmpd}/${expid}.job.log"
+
         # Select entrypoint
         case ${QUEUE_ENV} in
           qsub)
-            exec_cmd="qsub -j y -o ${tmpd}/${expid}.uge.log -N ${expid} -l mem_req=4G,s_vmem=4G -pe def_slot ${NUMBER_OF_THREADS}"
+            exec_cmd="qsub -j y -o ${job_logfile} -N ${expid} -l mem_req=4G,s_vmem=4G -pe def_slot ${NUMBER_OF_THREADS}"
+            ;;
+          slurm)
+            exec_cmd="sbatch -n ${NUMBER_OF_THREADS} -o ${job_logfile} -J ${expid}"
             ;;
           *)
             exec_cmd="sh"

@@ -25,6 +25,10 @@ NUMBER_OF_THREADS=2
 #USE_UGE="true"
 #LEAVE_TMPDIR="true"
 
+# Uncomment lines below to enable slurm execution
+#USE_SLURM="true"
+#LEAVE_TMPDIR="true"
+
 # Set path to the calculation workflow script, should be absolute path
 WF_SCRIPT="${HOME}/repos/rnaseq-readcount-workflow/bin/rnaseq_readcount.sh"
 
