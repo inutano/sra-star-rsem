@@ -15,8 +15,8 @@ OUTDIR="${HOME}/data/readcount"
 # Set database where the workflow fetch data from. "ncbi" or "ddbj"
 DATABASE="ddbj"
 
-# Set number of parallel FTP connections for data download
-NUMBER_OF_PARALLEL_FTP=8
+# Set number of parallel FTP connections for data download. Do not exceed 3 when connecting to ddbj server.
+NUMBER_OF_PARALLEL_FTP=2
 
 # Set number of threads to be used by calculation
 NUMBER_OF_THREADS=2
