@@ -214,6 +214,8 @@ run_step(){
 
   if [[ "${failure}" != "0" ]]; then
     logging "[step ${stepname}] failure"
+    find "${TMPDIR}" -name '*log' | xargs -I{} mv {} "${OUTDIR}"
+    clean_directories
     exit 1
   else
     logging "[step ${stepname}] completed success"
