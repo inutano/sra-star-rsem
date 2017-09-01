@@ -342,7 +342,9 @@ init_calculation(){
         cmd="${WF_SCRIPT} -j ${JOB_CONF} -f ${items} -x ${expid} --tmpdir ${tmpd} --outdir ${OUTDIR} --delete-input"
 
         # log file for job scheduling system
-        job_logfile="${tmpd}/${expid}.job.log"
+        job_logdir="${OUTDIR}/job/${expid:0:6}/${expid}"
+        [[ "${QUEUE_ENV}" ]] && mkdir -p "${job_logdir}"
+        job_logfile="${job_logdir}/${expid}.job.log"
 
         # Select entrypoint
         case ${QUEUE_ENV} in
