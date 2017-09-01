@@ -8,7 +8,7 @@
 #      ./rnaseq_readcount.sh -j job_conf.sh -f SRR1274307.sra,SRR1274306.sra -x SRX534534
 #
 set -e
-VERSION="201708231635"
+VERSION="201709011650"
 
 #
 # argparse
