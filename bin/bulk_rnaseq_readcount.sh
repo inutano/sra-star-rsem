@@ -332,7 +332,7 @@ init_calculation(){
         expid=$(basename "${expdir}")
 
         # Move downloaded data to tmpdir for calculation
-        mv "${expdir}" "${CALC_TMPDIR}"
+        rsync -a "${expdir}" "${CALC_TMPDIR}" && rm -fr "${expdir}"
         tmpd="${CALC_TMPDIR}/${expid}"
 
         # List items to be processed
