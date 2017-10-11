@@ -299,7 +299,7 @@ init_download() {
   logging "Start downloading data.." 'date_on'
 
   echo "${EXPS}" | while read exp_id; do
-    fetch_data "${exp_id}"
+    fetch_data "${exp_id}" ||:
   done
 
   # Create token and cleaning tmpdir
