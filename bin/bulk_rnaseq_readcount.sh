@@ -255,7 +255,14 @@ fetch_data_lftp() {
 
   # Get file size
   filesize=$(get_filesize "${url}")
-  echo "Total file size: ${filesize}" >> "${download_log}"
+
+  if [[ ${filesize} ]]; then
+    echo "Total file size: ${filesize}" >> "${download_log}"
+  else
+    echo "ERROR: File not found on remote server." >> "${download_log}"
+    return 1
+  fi
+
   fsize_double=$(( ${filesize} * 2 ))
 
   # Wait until disk is free (at least free space of double file size is required)
@@ -299,7 +306,7 @@ init_download() {
   logging "Start downloading data.." 'date_on'
 
   echo "${EXPS}" | while read exp_id; do
-    fetch_data "${exp_id}" ||:
+    fetch_data "${exp_id}"
   done
 
   # Create token and cleaning tmpdir
