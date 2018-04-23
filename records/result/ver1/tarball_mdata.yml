@@ -1,7 +1,20 @@
 filename: readcount_results.ver1.tgz
-filesize: 188_912_329_043
+filesize: 188912329043
 md5sum: 2cb2872e3d426a6c1d2dd1c631e88e28
-number_of_experiments:
-  total: 156764
-  hg38: 52938
-  mm10: 103826
+data:
+  Homo_sapiens:
+    reference:
+      genome_version: hg38
+      annotation: UCSC_archive-2015-08-14-08-18-15
+    number_of_experiments: 52938
+  Mus_musculus:
+    reference:
+      genome_version: mm10
+      annotation: UCSC_archive-2015-07-17-14-33-26
+    number_of_experiments: 103826
+processing:
+  software_version:
+    - pfastq-dump: 0.1.6
+    - fastq-dump: 2.8.2
+    - RSEM: v1.2.31-inutano.1
+    - STAR: STAR_2.5.2b
