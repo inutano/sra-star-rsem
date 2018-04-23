@@ -1,0 +1,7 @@
+filename: readcount_results.ver1.tgz
+filesize: 188_912_329_043
+md5sum: 2cb2872e3d426a6c1d2dd1c631e88e28
+number_of_experiments:
+  total: 156764
+  hg38: 52938
+  mm10: 103826
