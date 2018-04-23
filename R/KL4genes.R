@@ -102,10 +102,10 @@ genesDensity <- function(data.path, genes.rds.path, dens.rds.path){
 			# Normalize each value by deviding with the max value
 			normalized.values <- v.ratio / max(v.ratio)
 			# Output histogram
-			# out.pdf.path <- file.path(hist.dir, paste(gsub("/","__",geneName), "histogram", script.version, "pdf", sep="."))
-			# pdf(out.pdf.path, width=5, height=4)
+			out.pdf.path <- file.path(hist.dir, paste(gsub("/","__",geneName), "histogram", script.version, "pdf", sep="."))
+			pdf(out.pdf.path, width=5, height=4)
 			h <- hist(normalized.values, breaks=seq(0,1,0.02))
-			# dev.off()
+			dev.off()
 			# Save density
 			d <- h$density
 			dens[[geneName]] <- d
