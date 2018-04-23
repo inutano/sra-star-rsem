@@ -148,7 +148,7 @@ calcKLdist <- function(genes, dens){
 	})
 
 	# Configure matrix: convert elements to numeric and set row/colnames
-	dist.mat <- matrix(sapply(dist.mat, as.numeric), nrow=dist.mat.length, ncol=dist.mat.length)
+	dist.mat <- matrix(sapply(dist.mat, as.numeric), nrow=NROW(dist.mat), ncol=NROW(dist.mat))
 	storage.mode(dist.mat) <- "numeric"
 	rownames(dist.mat) <- colnames(dist.mat) <- genes
   # return dist.mat
