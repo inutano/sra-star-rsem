@@ -11,9 +11,9 @@ find "${workdir}" -name '*ReadsPerGene.out.tab' | split -l $(($(ulimit -n)-10)) 
 
 # Paste files for each list
 for list in lists*; do
-  paste $(cat $list) | \
+  paste $(cat ${list}) | \
   awk '{ printf $1; for(i=1;i<=NF;i++){ if(i%4==2){ printf "\t" $i } }; printf "\n" }' \
-  > merged${list##lists}
+  > "merged${list##lists}"
 done
 
 # Check the numbre of merged files
