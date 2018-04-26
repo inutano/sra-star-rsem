@@ -17,7 +17,7 @@ for list in lists*; do
 done
 
 # Check the numbre of merged files
-if [[ $(ls merged* | wc -l) > $(ulimit -n) ]]; then
+if [[ $(ls merged* | wc -l) -gt $(ulimit -n) ]]; then
   echo "Too many files or something went wrong. exit"
   exit 1
 fi
