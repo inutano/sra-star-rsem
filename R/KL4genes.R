@@ -141,16 +141,22 @@ calcKLdist <- function(genes, dens){
 				0.0
 			# } else if(is.na(dens[[genes[j]]][1])) {
 			#
-			} else {
-				KL.dist(dens[[genes[i]]], dens[[genes[j]]], k=1)
+      } else if(i>j) {
+				KL.dist(dens[[genes[i]]], dens[[genes[j]]], k=10)[10]
 			}
 		}
 	})
 
-	# Configure matrix: convert elements to numeric and set row/colnames
+	# Configure matrix: convert elements to numeric
 	dist.mat <- matrix(sapply(dist.mat, as.numeric), nrow=NROW(dist.mat), ncol=NROW(dist.mat))
 	storage.mode(dist.mat) <- "numeric"
-	rownames(dist.mat) <- colnames(dist.mat) <- genes
+
+  # Fill lower triangle
+  mat[lower.tri(mat)] <- t(mat)[lower.tri(mat)]
+
+  # Set row/col names
+  rownames(dist.mat) <- colnames(dist.mat) <- genes
+
   # return dist.mat
 	dist.mat
 }
