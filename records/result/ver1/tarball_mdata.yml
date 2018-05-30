@@ -7,12 +7,14 @@ data:
       genome_version: hg38
       annotation: UCSC_archive-2015-08-14-08-18-15
     number_of_experiments: 52938
+    total_number_of_reads: 1708441008662
     total_number_of_bases: 136519507195069
   Mus_musculus:
     reference:
       genome_version: mm10
       annotation: UCSC_archive-2015-07-17-14-33-26
     number_of_experiments: 103826
+    total_number_of_reads: 2208028541763
     total_number_of_bases: 170447192561061
 processing:
   software_version:
