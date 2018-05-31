@@ -136,9 +136,12 @@ dens <- readRDS(dens.rds.path)
 #
 
 calcKLdist <- function(genes, dens){
+  # Change this line to a small number for testing
+  num_of_rows <- NROW(genes)
+
   # Loop over genes to create matrix of KL distance
-  dist.mat <- npforeach(i = 1:NROW(genes), .combine=cbind) ({
-    pforeach(j = 1:NROW(genes)) ({
+  dist.mat <- npforeach(i = 1:num_of_rows, .combine=cbind) ({
+    pforeach(j = 1:num_of_rows ({
       if(i==j){
         0.0
       # } else if(is.na(dens[[genes[j]]][1])) { #TODO
@@ -170,7 +173,7 @@ calcKLdist <- function(genes, dens){
   mat[lower.tri(mat)] <- t(mat)[lower.tri(mat)]
 
   # Set row/col names
-  rownames(dist.mat) <- colnames(dist.mat) <- genes
+  rownames(dist.mat) <- colnames(dist.mat) <- genes[0:num_of_rows]
 
   # return dist.mat
   dist.mat
