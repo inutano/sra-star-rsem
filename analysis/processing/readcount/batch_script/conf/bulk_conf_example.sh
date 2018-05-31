@@ -18,7 +18,7 @@ DATABASE="ddbj"
 # Set number of parallel FTP connections for data download. Do not exceed 3 when connecting to ddbj server.
 NUMBER_OF_PARALLEL_FTP=2
 
-# Set number of threads to be used by calculation
+# Set number of threads for parallel execution
 NUMBER_OF_THREADS=2
 
 # Uncomment lines below to enable UGE execution
