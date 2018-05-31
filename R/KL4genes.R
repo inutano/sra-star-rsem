@@ -137,8 +137,8 @@ dens <- readRDS(dens.rds.path)
 
 calcKLdist <- function(genes, dens){
   # Loop over genes to create matrix of KL distance
-  pforeach(i = 1:NROW(genes), .combine=cbind) ({
-    dkl.vec <- foreach(j = 1:NROW(genes)) %do% {
+  dist.mat <- npforeach(i = 1:NROW(genes), .combine=cbind) ({
+    pforeach(j = 1:NROW(genes)) ({
       if(i==j){
         0.0
       # } else if(is.na(dens[[genes[j]]][1])) { #TODO
@@ -149,19 +149,18 @@ calcKLdist <- function(genes, dens){
         # KL distance
         (sum(p * log( p / q )) + sum(q * log( q / p ))) / 2
       }
-    }
+    })
     # Save object
-    pergene.dkl10.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl10.rds", sep="."))
-    # pergene.dkl.dist.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl.dist.rds", sep="."))
-    saveRDS(dkl.vec, pergene.dkl10.rds.path)
-    rm(dkl.vec)
+    # pergene.dkl.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl.rds", sep="."))
+    # saveRDS(dkl.vec, pergene.dkl10.rds.path)
+    # rm(dkl.vec)
   })
 
   # Read the RDS files for each gene
-  dist.mat <- pforeach(i = 1:NROW(genes), .combine=cbind) ({
-    pergene.dkl10.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl10.rds", sep="."))
-    readRDS(pergene.dkl10.rds.path)
-  })
+  # dist.mat <- pforeach(i = 1:NROW(genes), .combine=cbind) ({
+  #   pergene.dkl10.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl10.rds", sep="."))
+  #   readRDS(pergene.dkl10.rds.path)
+  # })
 
   # Configure matrix: convert elements to numeric
   dist.mat <- matrix(sapply(dist.mat, as.numeric), nrow=NROW(dist.mat), ncol=NROW(dist.mat))
