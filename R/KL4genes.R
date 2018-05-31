@@ -10,10 +10,10 @@
 #
 
 # FNN
-if (!require("FNN")) {
-  install.packages("FNN", repos="https://cran.ism.ac.jp/")
-}
-library("FNN")
+# if (!require("FNN")) {
+#   install.packages("FNN", repos="https://cran.ism.ac.jp/")
+# }
+# library("FNN")
 
 # pforeach
 if (!require("pforeach")) {
@@ -28,11 +28,13 @@ script.version = "v1.1"
 # Create output directory
 data.dir <- file.path(".", "data")
 rds.dir <- file.path(data.dir, "rds")
+pergene.rds.dir <- file.path(rds.dir, "pergene")
 plot.dir <- file.path(".", "plot")
-hist.dir <- file.path(plot.dir, "densitryHistogram")
+hist.dir <- file.path(plot.dir, "densityHistogram")
 hclust.dir <- file.path(plot.dir, "hclust")
 
 dir.create(rds.dir, showWarnings=FALSE, recursive=TRUE)
+dir.create(pergene.rds.dir, showWarnings=FALSE, recursive=TRUE)
 dir.create(hist.dir, showWarnings=FALSE, recursive=TRUE)
 dir.create(hclust.dir, showWarnings=FALSE, recursive=TRUE)
 
@@ -104,7 +106,7 @@ genesDensity <- function(data.path, genes.rds.path, dens.rds.path){
       # Output histogram
       out.pdf.path <- file.path(hist.dir, paste(gsub("/","__",geneName), "histogram", script.version, "pdf", sep="."))
       pdf(out.pdf.path, width=5, height=4)
-      h <- hist(normalized.values, breaks=seq(0,1,0.02))
+      h <- hist(normalized.values, breaks=seq(0,1,0.01))
       dev.off()
       # Save density
       d <- h$density
@@ -135,16 +137,30 @@ dens <- readRDS(dens.rds.path)
 
 calcKLdist <- function(genes, dens){
   # Loop over genes to create matrix of KL distance
-  dist.mat <- pforeach(i = 1:NROW(genes), .combine=cbind) ({
-    foreach(j = 1:NROW(genes)) %do% {
+  pforeach(i = 1:NROW(genes), .combine=cbind) ({
+    dkl.vec <- foreach(j = 1:NROW(genes)) %do% {
       if(i==j){
         0.0
-      # } else if(is.na(dens[[genes[j]]][1])) {
+      # } else if(is.na(dens[[genes[j]]][1])) { #TODO
       #
       } else if(i>j) {
-        KL.dist(dens[[genes[i]]], dens[[genes[j]]], k=10)[10]
+        p <- dens[[genes[i]]] + 0.000001
+        q <- dens[[genes[j]]] + 0.000001
+        # KL distance
+        (sum(p * log( p / q )) + sum(q * log( q / p ))) / 2
       }
     }
+    # Save object
+    pergene.dkl10.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl10.rds", sep="."))
+    # pergene.dkl.dist.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl.dist.rds", sep="."))
+    saveRDS(dkl.vec, pergene.dkl10.rds.path)
+    rm(dkl.vec)
+  })
+
+  # Read the RDS files for each gene
+  dist.mat <- pforeach(i = 1:NROW(genes), .combine=cbind) ({
+    pergene.dkl10.rds.path <- file.path(pergene.rds.dir, paste(gsub("/","__",genes[i]), "dkl10.rds", sep="."))
+    readRDS(pergene.dkl10.rds.path)
   })
 
   # Configure matrix: convert elements to numeric
