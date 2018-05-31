@@ -188,5 +188,9 @@ drawHclust <- function(dist.mat){
 }
 
 # Exec
+print("Start calculating KL.dist")
 dist.mat <- calcKLdist(genes, dens)
+print("Done.")
+print("Start drawing hclust..")
 drawHclust(dist.mat)
+print("Done.")
