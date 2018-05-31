@@ -141,7 +141,7 @@ calcKLdist <- function(genes, dens){
 
   # Loop over genes to create matrix of KL distance
   dist.mat <- npforeach(i = 1:num_of_rows, .combine=cbind) ({
-    pforeach(j = 1:num_of_rows ({
+    pforeach(j = 1:num_of_rows) ({
       if(i==j){
         0.0
       # } else if(is.na(dens[[genes[j]]][1])) { #TODO
