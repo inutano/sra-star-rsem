@@ -170,7 +170,7 @@ calcKLdist <- function(genes, dens){
   storage.mode(dist.mat) <- "numeric"
 
   # Fill lower triangle
-  mat[lower.tri(mat)] <- t(mat)[lower.tri(mat)]
+  dist.mat[lower.tri(dist.mat)] <- t(dist.mat)[lower.tri(dist.mat)]
 
   # Set row/col names
   rownames(dist.mat) <- colnames(dist.mat) <- genes[0:num_of_rows]
