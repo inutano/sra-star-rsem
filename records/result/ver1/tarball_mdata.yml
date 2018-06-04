@@ -9,6 +9,8 @@ data:
     number_of_experiments: 52938
     total_number_of_reads: 1708441008662
     total_number_of_bases: 136519507195069
+    total_filesize: 80599289349852
+    total_filesize_kb: 78710243505.7148
   Mus_musculus:
     reference:
       genome_version: mm10
@@ -16,6 +18,8 @@ data:
     number_of_experiments: 103826
     total_number_of_reads: 2208028541763
     total_number_of_bases: 170447192561061
+    total_filesize: 99126038859188
+    total_filesize_kb: 96802772323.4258
 processing:
   software_version:
     - pfastq-dump: 0.1.6
