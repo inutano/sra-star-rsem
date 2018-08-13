@@ -10,4 +10,4 @@ WORKDIR /
 RUN git clone --single-branch -b inutano https://github.com/inutano/RSEM
 RUN cd RSEM && make && make install
 
-CMD ["bash"]
+CMD ["sh"]
