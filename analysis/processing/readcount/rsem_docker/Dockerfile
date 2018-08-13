@@ -7,7 +7,7 @@ RUN git clone https://github.com/alexdobin/STAR && cd STAR && git checkout 2.6.0
 
 # Install RSEM
 WORKDIR /
-RUN git clone --single-branch -b inutano https://github.com/inutano/RSEM
+RUN git clone --single-branch -b STARNoSharedMemory https://github.com/inutano/RSEM
 RUN cd RSEM && make && make install
 
 CMD ["sh"]
