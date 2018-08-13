@@ -5,7 +5,7 @@ doc: "RSEM is a software package for estimating gene and isoform expression leve
 
 hints:
   DockerRequirement:
-    dockerPull: inutano/rsem:dev
+    dockerPull: quay.io/inutano/rsem:rsem-docker-0.1.0
 
 baseCommand: [rsem-calculate-expression, --star, --star-path, /STAR/bin/Linux_x86_64_static, --keep-intermediate-files, --no-bam-output]
 
