@@ -7,7 +7,7 @@ hints:
   DockerRequirement:
     dockerPull: inutano/rsem:dev
 
-baseCommand: [rsem-calculate-expression, --star, --star-path, /STAR/bin/x86_64/STAR, --keep-intermediate-files, --no-bam-output]
+baseCommand: [rsem-calculate-expression, --star, --star-path, /STAR/bin/Linux_x86_64_static, --keep-intermediate-files, --no-bam-output]
 
 arguments:
   - valueFrom: $(inputs.rsem_index_dir.path)/$(inputs.rsem_index_prefix)
