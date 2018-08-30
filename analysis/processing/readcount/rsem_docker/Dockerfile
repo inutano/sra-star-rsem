@@ -3,7 +3,7 @@ RUN apk --update add build-base zlib-dev git perl
 
 # Install STAR
 WORKDIR /
-RUN git clone https://github.com/alexdobin/STAR && cd STAR && git checkout 2.6.0c
+RUN git clone https://github.com/alexdobin/STAR && cd STAR && git checkout 2.5.2b
 
 # Install RSEM
 WORKDIR /
