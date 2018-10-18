@@ -7,7 +7,8 @@ result="${workdir}/$(basename ${workdir}).genes_by_samples.tsv"
 cd "${workdir}"
 
 # Create separated list of files to avoid open files limit
-find "${workdir}" -name '*ReadsPerGene.out.tab' | split -l $(($(ulimit -n)-10)) -d - lists
+files=$(find "${workdir}" -name '*ReadsPerGene.out.tab')
+echo ${files} | split -l $(($(ulimit -n)-10)) -d - lists
 
 # Paste files for each list
 for list in lists*; do
