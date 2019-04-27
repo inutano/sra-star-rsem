@@ -43,8 +43,8 @@ install_pfastq_dump() {
     git clone "https://github.com/inutano/pfastq-dump"
     ln -s "${REPOS_DIR}/pfastq-dump/bin/pfastq-dump" "${cmd}"
     chmod +x "${cmd}"
-    "${cmd}" "--version"
   fi
+  "${cmd}" "--version"
 }
 
 install_star() {
@@ -55,7 +55,17 @@ install_star() {
     tar zxf "${STAR_VERSION}.tar.gz"
     cd "STAR-${STAR_VERSION}/source"
     make STAR
+    case "$(uname -s)" in
+      Linux*)
+        ln -s "./bin/Linux_x86_64_static/*" "${BIN_DIR}"
+      Darwin)
+        ln -s "./bin/MacOSX_x86_64/*" "${BIN_DIR}"
+      *)
+        echo "ERROR: Unknown operation system. Quit installing.."
+        exit 1
+    esac
   fi
+  "${cmd}" "--version"
 }
 
 install_rsem() {
@@ -66,8 +76,9 @@ install_rsem() {
     tar zxf "v${RSEM_VERSION}.tar.gz"
     cd "RSEM-${RSEM_VERSION}"
     make
-    make install DESTDIR="${BIN_DIR}"
+    make install DESTDIR="${REPOS_DIR}" prefix="/"
   fi
+  "${cmd}" "--version"
 }
 
 install_tools(){
@@ -77,13 +88,9 @@ install_tools(){
 }
 
 main(){
-  if [[ -e "${PROJECT_DIR}" ]]; then
-    echo "installed."
-  else
-    setup
-    check_prerequisites
-    install_tools
-  fi
+  setup
+  check_prerequisites
+  install_tools
 }
 
 #
