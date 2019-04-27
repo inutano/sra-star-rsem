@@ -9,7 +9,7 @@ REPOS_DIR="${PROJECT_DIR}/repos"
 BIN_DIR="${PROJECT_DIR}/bin"
 
 STAR_VERSION="2.5.2b"
-RSEM_VERSION="v1.2.31-inutano.1"
+RSEM_VERSION="1.2.31-inutano.1"
 
 #
 # Functions
@@ -62,8 +62,8 @@ install_rsem() {
   local cmd="${BIN_DIR}/rsem-calculate-expression"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
-    wget "https://github.com/inutano/RSEM/archive/${RSEM_VERSION}.tar.gz"
-    tar zxf "${RSEM_VERSION}.tar.gz"
+    wget "https://github.com/inutano/RSEM/archive/v${RSEM_VERSION}.tar.gz"
+    tar zxf "v${RSEM_VERSION}.tar.gz"
     cd "RSEM-${RSEM_VERSION}"
     make
     make install DESTDIR="${BIN_DIR}"
