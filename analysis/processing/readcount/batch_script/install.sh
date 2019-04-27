@@ -85,6 +85,7 @@ install_star(){
     tar zxf "${STAR_VERSION}.tar.gz"
     cd "STAR-${STAR_VERSION}/source"
     make STAR
+    cd ..
     case "$(uname -s)" in
       Linux*)
         ln -s "./bin/Linux_x86_64_static/"* "${BIN_DIR}"
@@ -108,7 +109,7 @@ install_rsem(){
     tar zxf "v${RSEM_VERSION}.tar.gz"
     cd "RSEM-${RSEM_VERSION}"
     make
-    make install DESTDIR="${REPOS_DIR}" prefix="/"
+    make install DESTDIR="${PROJECT_DIR}" prefix="/"
   fi
 }
 
