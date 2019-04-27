@@ -53,7 +53,7 @@ install_star() {
     cd ${REPOS_DIR}
     wget "https://github.com/alexdobin/STAR/archive/${STAR_VERSION}.tar.gz"
     tar zxf "${STAR_VERSION}.tar.gz"
-    cd "${STAR_VERSION}/source"
+    cd "STAR-${STAR_VERSION}/source"
     make STAR
   fi
 }
@@ -64,7 +64,7 @@ install_rsem() {
     cd ${REPOS_DIR}
     wget "https://github.com/inutano/RSEM/archive/${RSEM_VERSION}.tar.gz"
     tar zxf "${RSEM_VERSION}.tar.gz"
-    cd "${RSEM_VERSION}"
+    cd "RSEM-${RSEM_VERSION}"
     make
     make install DESTDIR="${BIN_DIR}"
   fi
