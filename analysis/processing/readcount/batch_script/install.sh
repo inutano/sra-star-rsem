@@ -8,6 +8,9 @@ PROJECT_DIR="${HOME}/.readcount"
 REPOS_DIR="${PROJECT_DIR}/repos"
 BIN_DIR="${PROJECT_DIR}/bin"
 
+STAR_VERSION="2.5.2b"
+RSEM_VERSION="v1.2.31-inutano.1"
+
 #
 # Functions
 #
@@ -48,8 +51,9 @@ install_star() {
   local cmd="${BIN_DIR}/STAR"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
-    git clone "https://github.com/alexdobin/STAR"
-    cd STAR/source
+    wget "https://github.com/alexdobin/STAR/archive/${STAR_VERSION}.tar.gz"
+    tar zxf "${STAR_VERSION}.tar.gz"
+    cd "${STAR_VERSION}/source"
     make STAR
   fi
 }
@@ -58,8 +62,9 @@ install_rsem() {
   local cmd="${BIN_DIR}/rsem-calculate-expression"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
-    git clone -b "inutano" "https://github.com/inutano/RSEM"
-    cd RSEM
+    wget "https://github.com/inutano/RSEM/archive/${RSEM_VERSION}.tar.gz"
+    tar zxf "${RSEM_VERSION}.tar.gz"
+    cd "${RSEM_VERSION}"
     make
     make install DESTDIR="${BIN_DIR}"
   fi
