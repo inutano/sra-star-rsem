@@ -4,12 +4,31 @@ set -e
 #
 # Variable
 #
+WORKFLOW_VERSION="1.0.0"
 PROJECT_DIR="${HOME}/.readcount"
 REPOS_DIR="${PROJECT_DIR}/repos"
 BIN_DIR="${PROJECT_DIR}/bin"
 
 STAR_VERSION="2.5.2b"
 RSEM_VERSION="1.2.31-inutano.1"
+
+#
+# Install target dir
+#
+while [[ $# -gt 0 ]]; do
+  key=${1}
+  case ${key} in
+    -v|--version)
+      echo "${WORKFLOW_VERSION}"
+      exit 0
+      ;;
+    --prefix)
+      PROJECT_DIR="${2}"
+      shift
+      ;;
+  esac
+  shift
+done
 
 #
 # Functions
