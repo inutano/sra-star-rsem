@@ -120,7 +120,7 @@ install_tools(){
 }
 
 check_version(){
-  for cmd in "${cmd_pfastq_dump}" "${cmd_star}" "${cmd_rsem}"; do
+  for cmd in "$(cmd_pfastq_dump)" "$(cmd_star)" "$(cmd_rsem)"; do
     $("${cmd}" "--version")
   done
 }
