@@ -38,8 +38,9 @@ install_pfastq_dump() {
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
     git clone "https://github.com/inutano/pfastq-dump"
-    ln -s "${REPOS_DIR}/bin/pfastq-dump" "${cmd}"
+    ln -s "${REPOS_DIR}/pfastq-dump/bin/pfastq-dump" "${cmd}"
     chmod +x "${cmd}"
+    "${cmd}" "--version"
   fi
 }
 
