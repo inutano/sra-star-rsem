@@ -36,12 +36,20 @@ check_prerequisites(){
   check_cmd "make"
 }
 
-cmd_pfastq_dump() { "${BIN_DIR}/pfastq-dump" }
-cmd_star() { "${BIN_DIR}/STAR" }
-cmd_rsem() { "${BIN_DIR}/rsem-calculate-expression" }
+cmd_pfastq_dump(){
+  echo "${BIN_DIR}/pfastq-dump"
+}
 
-install_pfastq_dump() {
-  local cmd="${cmd_pfastq_dump}"
+cmd_star(){
+  echo "${BIN_DIR}/STAR"
+}
+
+cmd_rsem(){
+  echo "${BIN_DIR}/rsem-calculate-expression"
+}
+
+install_pfastq_dump(){
+  local cmd="$(cmd_pfastq_dump)"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
     git clone "https://github.com/inutano/pfastq-dump"
@@ -50,8 +58,8 @@ install_pfastq_dump() {
   fi
 }
 
-install_star() {
-  local cmd="${cmd_star}"
+install_star(){
+  local cmd="$(cmd_star)"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
     wget "https://github.com/alexdobin/STAR/archive/${STAR_VERSION}.tar.gz"
@@ -73,8 +81,8 @@ install_star() {
   fi
 }
 
-install_rsem() {
-  local cmd="${cmd_rsem}"
+install_rsem(){
+  local cmd="$(cmd_rsem)"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
     wget "https://github.com/inutano/RSEM/archive/v${RSEM_VERSION}.tar.gz"
