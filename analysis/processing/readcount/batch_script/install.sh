@@ -58,11 +58,14 @@ install_star() {
     case "$(uname -s)" in
       Linux*)
         ln -s "./bin/Linux_x86_64_static/*" "${BIN_DIR}"
+        ;;
       Darwin)
         ln -s "./bin/MacOSX_x86_64/*" "${BIN_DIR}"
+        ;;
       *)
         echo "ERROR: Unknown operation system. Quit installing.."
         exit 1
+        ;;
     esac
   fi
   "${cmd}" "--version"
