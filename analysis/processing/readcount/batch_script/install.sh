@@ -36,19 +36,22 @@ check_prerequisites(){
   check_cmd "make"
 }
 
+cmd_pfastq_dump() { "${BIN_DIR}/pfastq-dump" }
+cmd_star() { "${BIN_DIR}/STAR" }
+cmd_rsem() { "${BIN_DIR}/rsem-calculate-expression" }
+
 install_pfastq_dump() {
-  local cmd="${BIN_DIR}/pfastq-dump"
+  local cmd="${cmd_pfastq_dump}"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
     git clone "https://github.com/inutano/pfastq-dump"
     ln -s "${REPOS_DIR}/pfastq-dump/bin/pfastq-dump" "${cmd}"
     chmod +x "${cmd}"
   fi
-  "${cmd}" "--version"
 }
 
 install_star() {
-  local cmd="${BIN_DIR}/STAR"
+  local cmd="${cmd_star}"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
     wget "https://github.com/alexdobin/STAR/archive/${STAR_VERSION}.tar.gz"
@@ -57,10 +60,10 @@ install_star() {
     make STAR
     case "$(uname -s)" in
       Linux*)
-        ln -s "./bin/Linux_x86_64_static/*" "${BIN_DIR}"
+        ln -s "./bin/Linux_x86_64_static/"* "${BIN_DIR}"
         ;;
       Darwin)
-        ln -s "./bin/MacOSX_x86_64/*" "${BIN_DIR}"
+        ln -s "./bin/MacOSX_x86_64/"* "${BIN_DIR}"
         ;;
       *)
         echo "ERROR: Unknown operation system. Quit installing.."
@@ -68,11 +71,10 @@ install_star() {
         ;;
     esac
   fi
-  "${cmd}" "--version"
 }
 
 install_rsem() {
-  local cmd="${BIN_DIR}/rsem-calculate-expression"
+  local cmd="${cmd_rsem}"
   if [[ ! -e "${cmd}" ]]; then
     cd ${REPOS_DIR}
     wget "https://github.com/inutano/RSEM/archive/v${RSEM_VERSION}.tar.gz"
@@ -81,7 +83,6 @@ install_rsem() {
     make
     make install DESTDIR="${REPOS_DIR}" prefix="/"
   fi
-  "${cmd}" "--version"
 }
 
 install_tools(){
@@ -90,10 +91,17 @@ install_tools(){
   install_rsem
 }
 
+check_version(){
+  for cmd in "${cmd_pfastq_dump}" "${cmd_star}" "${cmd_rsem}"; do
+    "${cmd}" --version
+  done
+}
+
 main(){
   setup
   check_prerequisites
   install_tools
+  check_version
 }
 
 #
