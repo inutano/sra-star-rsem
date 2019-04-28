@@ -75,13 +75,12 @@ install_star(){
     tar zxf "${STAR_VERSION}.tar.gz"
     cd "STAR-${STAR_VERSION}/source"
     make STAR
-    cd ..
     case "$(uname -s)" in
       Linux*)
-        ln -s "./bin/Linux_x86_64_static/"* "${BIN_DIR}"
+        ln -s "${REPOS_DIR}/STAR-${STAR_VERSION}/bin/Linux_x86_64_static/"* "${BIN_DIR}"
         ;;
       Darwin)
-        ln -s "./bin/MacOSX_x86_64/"* "${BIN_DIR}"
+        ln -s "${REPOS_DIR}/STAR-${STAR_VERSION}/bin/MacOSX_x86_64/"* "${BIN_DIR}"
         ;;
       *)
         echo "ERROR: Unknown operation system. Quit installing.."
