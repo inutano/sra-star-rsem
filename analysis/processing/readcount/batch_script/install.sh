@@ -12,6 +12,10 @@ BIN_DIR="${PROJECT_DIR}/bin"
 STAR_VERSION="2.5.2b"
 RSEM_VERSION="1.2.31-inutano.1"
 
+cmd_pfastq_dump="${BIN_DIR}/pfastq-dump"
+cmd_star="${BIN_DIR}/STAR"
+cmd_rsem="${BIN_DIR}/rsem-calculate-expression"
+
 #
 # Install target dir
 #
@@ -55,31 +59,17 @@ check_prerequisites(){
   check_cmd "make"
 }
 
-cmd_pfastq_dump(){
-  echo "${BIN_DIR}/pfastq-dump"
-}
-
-cmd_star(){
-  echo "${BIN_DIR}/STAR"
-}
-
-cmd_rsem(){
-  echo "${BIN_DIR}/rsem-calculate-expression"
-}
-
 install_pfastq_dump(){
-  local cmd="$(cmd_pfastq_dump)"
-  if [[ ! -e "${cmd}" ]]; then
+  if [[ ! -e "${cmd_pfastq_dump}" ]]; then
     cd ${REPOS_DIR}
     git clone "https://github.com/inutano/pfastq-dump"
-    ln -s "${REPOS_DIR}/pfastq-dump/bin/pfastq-dump" "${cmd}"
-    chmod +x "${cmd}"
+    ln -s "${REPOS_DIR}/pfastq-dump/bin/pfastq-dump" "${cmd_pfastq_dump}"
+    chmod +x "${cmd_pfastq_dump}"
   fi
 }
 
 install_star(){
-  local cmd="$(cmd_star)"
-  if [[ ! -e "${cmd}" ]]; then
+  if [[ ! -e "${cmd_star}" ]]; then
     cd ${REPOS_DIR}
     wget "https://github.com/alexdobin/STAR/archive/${STAR_VERSION}.tar.gz"
     tar zxf "${STAR_VERSION}.tar.gz"
@@ -102,8 +92,7 @@ install_star(){
 }
 
 install_rsem(){
-  local cmd="$(cmd_rsem)"
-  if [[ ! -e "${cmd}" ]]; then
+  if [[ ! -e "${cmd_rsem}" ]]; then
     cd ${REPOS_DIR}
     wget "https://github.com/inutano/RSEM/archive/v${RSEM_VERSION}.tar.gz"
     tar zxf "v${RSEM_VERSION}.tar.gz"
@@ -120,9 +109,9 @@ install_tools(){
 }
 
 check_version(){
-  for cmd in "$(cmd_pfastq_dump)" "$(cmd_star)" "$(cmd_rsem)"; do
-    $("${cmd}" "--version")
-  done
+  "${cmd_pfastq_dump}" "--version"
+  "${cmd_star}" "--version"
+  "${cmd_rsem}" "--version"
 }
 
 main(){
