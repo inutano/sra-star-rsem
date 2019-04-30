@@ -5,12 +5,12 @@ Common Workflow Language (CWL) is a workflow description standard developed by t
 ## Prerequisites
 
 - Workflow runner
-  - Any of workflow runners that support CWL. For starter, we recommend the most basic local runner [cwltool](https://github.com/common-workflow-language/cwltool/).
+  - Any of [workflow runners that support CWL](https://www.commonwl.org/#Implementations). The top recommendation for CWL beginners is the most basic local runner [cwltool](https://github.com/common-workflow-language/cwltool/), the reference runner of CWL.
   - The workflow is verified with the cwltool version `1.0.20190228155703`.
 - Container engine
-  - You may need to install one of the container engines, Docker, uDocker, or Singularity.
+  - You may need to install one of the container engines, [Docker](https://www.docker.com), [uDocker](https://github.com/indigo-dc/udocker), or [Singularity](https://www.sylabs.io/docs/).
   - cwltool will use Docker as default container engine: you need to use `--singularity` option to use Singularity.
-- STAR reference index
+- RSEM/STAR reference index
   - You can use your own build, or you may want to download RSEM/STAR index for human GRCh38 from [here](https://s3.amazonaws.com/nig-reference/GRCh38/rsem_star_index/rsem_star_GRCh38.tar.gz)(25GB, MD5: `12991b5ab993ae14b4bb3f95fee37e59`).
 
 ## Quick start
@@ -35,7 +35,7 @@ $ cwltool --debug rsem-calculate-expression.cwl \
     --input_fastq SRR1274306.fastq
 ```
 
-cwltool supports YAML format job configuration file which can be used to set the parameters in a reproducible way:
+cwltool supports YAML format job configuration file which can be used to set the parameters:
 
 ```
 $ cwltool --make-template rsem-calculate-expression.cwl > job_conf.yaml
@@ -77,7 +77,7 @@ $ cwltool --debug rsem_wf.cwl \
     --run_ids SRR1274306
 ```
 
-We recommend to make a job configuration file by `--make-template` which makes your life easier:
+Generating a job configuration file by `--make-template` is recommended to make your life easier:
 
 ```
 $ cwltool --make-template rsem_wf.cwl > job_conf.yaml
