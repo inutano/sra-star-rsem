@@ -8,7 +8,7 @@ Note that the workflow requires >32GB memory for human/mouse RNA-Seq data.
 
 ## Workflow steps
 
-![workflow structure drawn by view.commonwl.org](analysis/processing/readcount/cwl/images/star-rsem.png)
+![workflow structure drawn by [view.commonwl.org](https://view.commonwl.org/workflows/github.com/inutano/sra-star-rsem/blob/master/analysis/processing/readcount/cwl/rsem_from_sra_wf.cwl)](analysis/processing/readcount/cwl/images/star-rsem.png)
 
 The image is drawn by [view.commonwl.org](https://view.commonwl.org)
 
